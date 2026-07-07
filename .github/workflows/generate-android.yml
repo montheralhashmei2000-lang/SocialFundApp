@@ -1,0 +1,20 @@
+name: Generate Android Folder
+on:
+  workflow_dispatch: # هذا يعني أننا سنشغل العملية يدوياً من زر في موقع GitHub
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate React Native Project
+        run: |
+          npx react-native@latest init TempProject --skip-install
+          
+      - name: Archive Android Folder
+        run: tar -czf android_folder.tar.gz TempProject/android
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-folder
+          path: android_folder.tar.gz
