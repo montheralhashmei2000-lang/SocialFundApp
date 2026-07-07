@@ -1,0 +1,13 @@
+node_modules/
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+*.keystore
+*.jks
+.idea/
+*.iml
+.vscode/
+.DS_Store
+npm-debug.log
+yarn-error.log
