@@ -8,7 +8,7 @@ on:
 
 defaults:
   run:
-    working-directory: ./أندرويد/تطبيق التمويل الاجتماعي
+    working-directory: ./Android/app
 
 jobs:
   build:
