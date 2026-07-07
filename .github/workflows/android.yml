@@ -24,13 +24,10 @@ jobs:
         cache: 'npm'
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci
 
     - name: Grant execute permission for gradlew
       run: chmod +x android/gradlew
 
-    - name: Use specific Gradle version
-      run: cd android && ./gradlew wrapper --gradle-version 8.7
-
     - name: Build with Gradle
-      run: cd android && ./gradlew assembleDebug --stacktrace --info
+      run: cd android && ./gradlew clean assembleDebug --stacktrace
