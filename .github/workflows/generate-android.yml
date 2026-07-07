@@ -8,7 +8,7 @@ jobs:
     steps:
       - name: Generate React Native Project
         run: |
-          npx react-native@latest init TempProject --skip-install
+          npx @react-native-community/cli@latest init TempProject --skip-install
           
       - name: Archive Android Folder
         run: tar -czf android_folder.tar.gz TempProject/android
