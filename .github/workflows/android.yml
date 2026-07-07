@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ "main" ]
 
+defaults:
+  run:
+    working-directory: ./أندرويد/تطبيق التمويل الاجتماعي
+
 jobs:
   build:
     runs-on: ubuntu-latest
