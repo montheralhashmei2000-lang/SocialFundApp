@@ -2,6 +2,7 @@
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, StatusBar} from 'react-native';
 import {NavigationContainer, DrawerActions, useNavigation} from '@react-navigation/native';
+import {navigationRef} from './navigationRef';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import LinearGradient from 'react-native-linear-gradient';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -104,7 +105,7 @@ export default function RootNavigator() {
   const {theme} = useTheme();
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Drawer.Navigator
         initialRouteName="Dashboard"
         drawerContent={props => <DrawerContent {...props} />}

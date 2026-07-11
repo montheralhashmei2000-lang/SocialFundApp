@@ -4,12 +4,14 @@ import {StatusBar, View, ActivityIndicator, Text} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+import messaging from '@react-native-firebase/messaging';
 
 import {ThemeProvider, useTheme} from './src/context/ThemeContext';
 import {DataProvider, useData} from './src/context/DataContext';
 import LoginScreen from './src/screens/LoginScreen';
 import RootNavigator from './src/navigation/RootNavigator';
-import messaging from '@react-native-firebase/messaging';
+import {listenForegroundMessages, resolveNotificationRoute} from './src/api/push';
+import {navigate} from './src/navigation/navigationRef';
 
 function LoadingGate() {
   const {theme} = useTheme();
@@ -21,9 +23,53 @@ function LoadingGate() {
   );
 }
 
+/**
+ * Handles all three states a push notification can arrive in:
+ *   - Foreground (app open): shown as an in-app toast via Toast.show, since
+ *     a system notification would be redundant while the user is looking
+ *     at the screen already.
+ *   - Background (app minimized, tapped from tray): onNotificationOpenedApp.
+ *   - Quit (app fully closed, opened by tapping the notification):
+ *     getInitialNotification, checked once on mount.
+ * In both of the last two cases we navigate to the screen relevant to the
+ * notification's `data.type` (see resolveNotificationRoute in api/push.js).
+ */
+function usePushNotificationRouting() {
+  const {user} = useData();
+
+  useEffect(() => {
+    if (!user) return undefined;
+
+    const unsubForeground = listenForegroundMessages(({title, body}) => {
+      Toast.show({type: 'info', text1: title, text2: body, position: 'top', visibilityTime: 4000});
+    });
+
+    const unsubOpened = messaging().onNotificationOpenedApp(remoteMessage => {
+      if (remoteMessage) {
+        const route = resolveNotificationRoute(remoteMessage.data);
+        navigate(route.screen, route.params);
+      }
+    });
+
+    messaging()
+      .getInitialNotification()
+      .then(remoteMessage => {
+        if (remoteMessage) {
+          const route = resolveNotificationRoute(remoteMessage.data);
+          navigate(route.screen, route.params);
+        }
+      });
+
+    return () => {
+      unsubForeground?.();
+      unsubOpened?.();
+    };
+  }, [user]);
+}
+
 function Root() {
-  const {theme} = useTheme();
   const {user, hydrated} = useData();
+  usePushNotificationRouting();
 
   if (!hydrated) return <LoadingGate />;
 
@@ -36,23 +82,8 @@ function Root() {
   );
 }
 
-async function requestNotificationPermission() {
-  const authStatus = await messaging().requestPermission();
-
-  const enabled =
-    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-
-  if (enabled) {
-    const token = await messaging().getToken();
-    console.log("FCM TOKEN:", token);
-  }
-}
 export default function App() {
-useEffect(() => {
-  requestNotificationPermission();
-}, []); 
- return (
+  return (
     <GestureHandlerRootView style={{flex: 1}}>
       <SafeAreaProvider>
         <ThemeProvider>

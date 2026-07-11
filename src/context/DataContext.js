@@ -6,6 +6,7 @@ import {
   MEMBERS, AIDS, SUBSCRIPTIONS, TREASURY, RECEIPTS, PAYMENTS, MESSAGES, EVENTS,
 } from '../data';
 import * as authApi from '../api/auth';
+import {initPush, unregisterPush} from '../api/push';
 import {queueChange, runSync, getPendingCount} from '../api/sync';
 import {api, ApiError, NetworkError} from '../api/client';
 import {
@@ -156,7 +157,10 @@ export function DataProvider({children}) {
 
   const setUser = useCallback(u => {
     setUserState(u);
-    if (!u) {
+    if (u) {
+      initPush().catch(() => {});
+    } else {
+      unregisterPush().catch(() => {});
       authApi.logout().catch(() => {});
     }
   }, []);
