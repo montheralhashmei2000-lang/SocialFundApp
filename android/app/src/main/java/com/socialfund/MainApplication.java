@@ -1,7 +1,6 @@
 package com.socialfund;
 
 import android.app.Application;
-import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactHost;
 import com.facebook.react.ReactNativeHost;
@@ -23,8 +22,7 @@ public class MainApplication extends Application implements ReactApplication {
 
         @Override
         protected List<ReactPackage> getPackages() {
-          List<ReactPackage> packages = new PackageList(this).getPackages();
-          return packages;
+          return java.util.Collections.emptyList();
         }
 
         @Override
